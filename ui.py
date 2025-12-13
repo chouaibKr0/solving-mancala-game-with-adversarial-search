@@ -10,19 +10,19 @@ from typing import Optional, Tuple
 from mancala_game import MancalaGame
 
 
-# Color definitions
-BACKGROUND = (34, 139, 34)  # Forest green
-BOARD_COLOR = (139, 69, 19)  # Saddle brown
-PIT_COLOR = (101, 67, 33)  # Dark brown
-STORE_COLOR = (160, 82, 45)  # Sienna
+# Color definitions - High contrast theme
+BACKGROUND = (30, 30, 50)  # Dark blue-gray
+BOARD_COLOR = (139, 90, 43)  # Warm brown
+PIT_COLOR = (60, 60, 80)  # Dark slate
+STORE_COLOR = (80, 80, 110)  # Lighter slate
 STONE_COLOR = (255, 255, 255)  # White
 TEXT_COLOR = (255, 255, 255)  # White
-HIGHLIGHT_COLOR = (255, 215, 0)  # Gold
-HOVER_COLOR = (255, 255, 0)  # Yellow
-PLAYER1_COLOR = (70, 130, 180)  # Steel blue
-PLAYER2_COLOR = (220, 20, 60)  # Crimson
+HIGHLIGHT_COLOR = (0, 255, 150)  # Bright green
+HOVER_COLOR = (255, 200, 100)  # Warm orange
+PLAYER1_COLOR = (100, 200, 255)  # Light blue
+PLAYER2_COLOR = (255, 120, 120)  # Light red/pink
 BUTTON_COLOR = (70, 130, 180)  # Steel blue
-BUTTON_HOVER = (100, 149, 237)  # Cornflower blue
+BUTTON_HOVER = (100, 180, 230)  # Lighter blue
 
 
 class MancalaUI:
