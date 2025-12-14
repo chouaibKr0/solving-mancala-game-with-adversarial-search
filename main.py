@@ -64,11 +64,12 @@ class GameController:
             
             # Menu options
             menu_options = [
-                ("Human vs Human", 220),
-                ("Human vs AI", 290),
-                ("AI vs Human", 360),
-                ("AI vs AI", 430),
-                ("Quit", 520)
+                ("Human vs Human", 200),
+                ("Human vs AI", 270),
+                ("AI vs Human", 340),
+                ("AI vs AI", 410),
+                ("Help", 480),
+                ("Quit", 550)
             ]
             
             buttons = []
@@ -110,12 +111,18 @@ class GameController:
                             elif text == "AI vs AI":
                                 self.setup_game('ai', 'ai')
                                 return True
+                            elif text == "Help":
+                                if not self.ui.draw_help_screen():
+                                    return False
                             elif text == "Quit":
                                 return False
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
                         return False
+                    elif event.key == pygame.K_h:
+                        if not self.ui.draw_help_screen():
+                            return False
             
             self.ui.clock.tick(30)
         
@@ -270,6 +277,18 @@ class GameController:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         return None
+                    
+                    if event.key == pygame.K_h:
+                        # Show help screen
+                        self.ui.draw_help_screen()
+                        self.ui.draw_board(self.game, player, 
+                                         self.player1_name, self.player2_name)
+                    
+                    if event.key == pygame.K_r:
+                        # Restart game - show confirmation
+                        self.ui.show_message("Press R again to restart")
+                        self.ui.draw_board(self.game, player, 
+                                         self.player1_name, self.player2_name)
                     
                     # Allow keyboard input for pit selection
                     if event.key in [pygame.K_0, pygame.K_1, pygame.K_2, 
