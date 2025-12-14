@@ -15,9 +15,15 @@ class AIAgent:
     """
     AI agent using Minimax algorithm with Alpha-Beta pruning.
     Includes timeout mechanism for move decisions.
+    Supports multiple heuristic strategies.
     """
     
-    def __init__(self, player: int, max_depth: int = 6, timeout: float = 5.0):
+    # Available heuristic types
+    HEURISTIC_BALANCED = 'balanced'      # Store difference + stone count (default for Player 1)
+    HEURISTIC_AGGRESSIVE = 'aggressive'  # Maximize captures + extra turns (default for Player 2)
+    
+    def __init__(self, player: int, max_depth: int = 6, timeout: float = 5.0, 
+                 heuristic_type: str = None):
         """
         Initialize the AI agent.
         
@@ -25,12 +31,19 @@ class AIAgent:
             player: Player number (1 or 2)
             max_depth: Maximum search depth for Minimax
             timeout: Time limit in seconds for move decision
+            heuristic_type: 'balanced' or 'aggressive' (auto-selected by player if None)
         """
         self.player = player
         self.max_depth = max_depth
         self.timeout = timeout
         self.best_move = None
         self.search_cancelled = False
+        
+        # Auto-select heuristic based on player if not specified
+        if heuristic_type is None:
+            self.heuristic_type = self.HEURISTIC_BALANCED if player == 1 else self.HEURISTIC_AGGRESSIVE
+        else:
+            self.heuristic_type = heuristic_type
     
     def get_move(self, game: MancalaGame) -> int:
         """
@@ -219,7 +232,7 @@ class AIAgent:
     
     def _evaluate_state(self, game: MancalaGame) -> float:
         """
-        Evaluate a game state using heuristic function.
+        Evaluate a game state using the selected heuristic function.
         
         Args:
             game: Game state to evaluate
@@ -230,7 +243,18 @@ class AIAgent:
         if game.is_game_over():
             return self._evaluate_terminal(game)
         
-        # Heuristic: difference in stores + position advantage
+        if self.heuristic_type == self.HEURISTIC_AGGRESSIVE:
+            return self._heuristic_aggressive(game)
+        else:
+            return self._heuristic_balanced(game)
+    
+    def _heuristic_balanced(self, game: MancalaGame) -> float:
+        """
+        Balanced Heuristic (Player 1 default):
+        Focuses on store difference and maintaining stone advantage.
+        
+        Strategy: Steady accumulation, defensive play
+        """
         my_store = game.board[6] if self.player == 1 else game.board[13]
         opp_store = game.board[13] if self.player == 1 else game.board[6]
         
@@ -246,6 +270,57 @@ class AIAgent:
             opp_stones = sum(game.board[0:6])
         
         score += (my_stones - opp_stones) * 0.5
+        
+        return score
+    
+    def _heuristic_aggressive(self, game: MancalaGame) -> float:
+        """
+        Aggressive Heuristic (Player 2 default):
+        Prioritizes captures, extra turns, and attacking opponent's stones.
+        
+        Strategy: High-risk, high-reward plays
+        """
+        my_store = game.board[6] if self.player == 1 else game.board[13]
+        opp_store = game.board[13] if self.player == 1 else game.board[6]
+        
+        # Base score from stores (weighted higher)
+        score = (my_store - opp_store) * 15
+        
+        # Determine my pits and opponent pits
+        if self.player == 1:
+            my_pits = range(6)
+            opp_pits = range(7, 13)
+            my_store_idx = 6
+        else:
+            my_pits = range(7, 13)
+            opp_pits = range(0, 6)
+            my_store_idx = 13
+        
+        # Count capture opportunities (empty pits with stones opposite)
+        capture_potential = 0
+        for pit in my_pits:
+            if game.board[pit] == 0:  # Empty pit on my side
+                opposite = 12 - pit
+                if game.board[opposite] > 0:  # Opponent has stones opposite
+                    capture_potential += game.board[opposite]
+        
+        score += capture_potential * 3
+        
+        # Count extra turn opportunities (pits that can land in store)
+        extra_turn_potential = 0
+        for pit in my_pits:
+            stones = game.board[pit]
+            if stones > 0:
+                # Calculate where last stone lands
+                distance_to_store = my_store_idx - pit
+                if stones == distance_to_store:
+                    extra_turn_potential += 2
+        
+        score += extra_turn_potential * 4
+        
+        # Penalize opponent's stones heavily (aggressive stance)
+        opp_stones = sum(game.board[pit] for pit in opp_pits)
+        score -= opp_stones * 0.8
         
         return score
     
