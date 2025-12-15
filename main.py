@@ -52,24 +52,27 @@ class GameController:
         while menu_running:
             self.ui.screen.fill((34, 139, 34))
             
-            # Title
+            # Title (move up to create more room for buttons)
             title = self.ui.title_font.render("Mancala Game", True, (255, 255, 255))
-            title_rect = title.get_rect(center=(self.ui.width // 2, 80))
+            title_rect = title.get_rect(center=(self.ui.width // 2, 60))
             self.ui.screen.blit(title, title_rect)
             
-            # Subtitle
+            # Subtitle (move up to avoid bottom boundary interference)
             subtitle = self.ui.font.render("Select Game Mode", True, (255, 255, 255))
-            subtitle_rect = subtitle.get_rect(center=(self.ui.width // 2, 140))
+            subtitle_rect = subtitle.get_rect(center=(self.ui.width // 2, 110))
             self.ui.screen.blit(subtitle, subtitle_rect)
             
             # Menu options
+            # Raise buttons to keep them well within the screen
+            top_y = 150
+            gap = 65
             menu_options = [
-                ("Human vs Human", 200),
-                ("Human vs AI", 270),
-                ("AI vs Human", 340),
-                ("AI vs AI", 410),
-                ("Help", 480),
-                ("Quit", 550)
+                ("Human vs Human", top_y + gap * 0),
+                ("Human vs AI",    top_y + gap * 1),
+                ("AI vs Human",    top_y + gap * 2),
+                ("AI vs AI",       top_y + gap * 3),
+                ("Help",            top_y + gap * 4),
+                ("Quit",            top_y + gap * 5)
             ]
             
             buttons = []

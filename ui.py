@@ -60,7 +60,8 @@ class MancalaUI:
         
         # Calculate total board width and center it
         total_board_width = self.pit_spacing * 6 + self.store_margin * 2 + self.store_width * 2
-        self.board_x = (width - total_board_width) // 2 + self.store_width + self.store_margin
+        self.board_left = (width - total_board_width) // 2  # absolute left of the board area
+        self.board_x = self.board_left + self.store_width + self.store_margin  # first pit anchor
         
         # Center board vertically with proper top margin
         board_height = self.store_height + 100
@@ -108,18 +109,18 @@ class MancalaUI:
         
         # Draw board background
         board_width = self.pit_spacing * 6 + self.store_margin * 2 + self.store_width * 2
-        board_rect = pygame.Rect(self.board_x - self.store_margin - self.store_width // 2, 
-                                 self.board_y - 50, 
-                                 board_width,
-                                 self.store_height + 100)
+        board_rect = pygame.Rect(self.board_left, 
+                     self.board_y - 50, 
+                     board_width,
+                     self.store_height + 100)
         pygame.draw.rect(self.screen, BOARD_COLOR, board_rect, border_radius=20)
         
         # Draw Player 2 store (left) with name
-        p2_store_x = self.board_x - self.store_margin - 5
+        p2_store_x = self.board_left + 5
         self._draw_store(13, p2_store_x, self.board_y + 50, game.board[13], player2_name)
         
         # Draw Player 1 store (right) with name
-        p1_store_x = self.board_x + self.pit_spacing * 6 + 5
+        p1_store_x = self.board_left + board_width - self.store_width - 5
         self._draw_store(6, p1_store_x, self.board_y + 50, game.board[6], player1_name)
         
         # Draw Player 2 pits (top row, indices 12-7, left to right)
