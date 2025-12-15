@@ -149,15 +149,20 @@ class AIAgent:
     def _minimax(self, game: MancalaGame, depth: int, alpha: float, beta: float,
                  maximizing: bool, current_player: int) -> float:
         """
-        Minimax algorithm with Alpha-Beta pruning.
+        Minimax algorithm with Alpha-Beta pruning (Assignment Version).
+        
+        Follows assignment pseudocode exactly:
+        - Terminal condition: depth == 1 (per assignment)
+        - Evaluation: value(n) = storeAI - storeHuman
+        - Alpha-Beta pruning for efficiency
         
         Args:
             game: Game state to evaluate
-            depth: Remaining search depth
+            depth: Remaining search depth (depth == 1 triggers evaluation)
             alpha: Alpha value for pruning
             beta: Beta value for pruning
-            maximizing: True if maximizing player's turn
-            current_player: Current player making move
+            maximizing: True if maximizing player's turn (Computer/MAX)
+            current_player: Current player making move (1 or 2)
             
         Returns:
             Evaluated score for this state
@@ -165,8 +170,8 @@ class AIAgent:
         if self.search_cancelled:
             return 0
         
-        # Terminal conditions
-        if depth == 0 or game.is_game_over():
+        # Terminal condition: depth == 1 (per assignment)
+        if depth == 1 or game.is_game_over():
             return self._evaluate_state(game)
         
         legal_moves = game.get_legal_moves(current_player)
@@ -232,21 +237,33 @@ class AIAgent:
     
     def _evaluate_state(self, game: MancalaGame) -> float:
         """
-        Evaluate a game state using the selected heuristic function.
+        Evaluate a game state using assignment's equation:
+        value(n) = nbSeedsStore(COMPUTER) - nbSeedsStore(HUMAN)
+        
+        Where COMPUTER = self.player (MAX) and HUMAN = opponent (MIN)
         
         Args:
             game: Game state to evaluate
             
         Returns:
-            Heuristic score
+            Evaluation score (store difference)
         """
         if game.is_game_over():
             return self._evaluate_terminal(game)
         
-        if self.heuristic_type == self.HEURISTIC_AGGRESSIVE:
-            return self._heuristic_aggressive(game)
+        # Get store indices based on AI player
+        if self.player == 1:
+            my_store = game.board[6]  # Player 1 store
+            opp_store = game.board[13]  # Player 2 store
         else:
-            return self._heuristic_balanced(game)
+            my_store = game.board[13]  # Player 2 store
+            opp_store = game.board[6]  # Player 1 store
+        
+        # Simple evaluation per assignment equation
+        # value(n) = nbSeedsStore(COMPUTER) - nbSeedsStore(HUMAN)
+        score = my_store - opp_store
+        
+        return float(score)
     
     def _heuristic_balanced(self, game: MancalaGame) -> float:
         """
